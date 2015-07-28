@@ -76,7 +76,7 @@ io.on('connection',function(socket){
   socket.on("serial_connect",function(data){
     switch(data){
       case 'connect' :
-        serialPort = new SerialPort("COM9",{baudrate : 9600},true,function(err){
+        serialPort = new SerialPort("/dev/ttyO1",{baudrate : 9600},true,function(err){
           if(err){
             console.log("connect error");
             socket.emit("serial_connect","error");
