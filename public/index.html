@@ -10,8 +10,19 @@
 	<script src="javascripts/Graphjs.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
 	<script>
+		var esc_id_1 = 1;
+		var esc_id_2 = 2;
+		var esc_id_3 = 3;
+
+		var esc_1_min = 20;
+		var esc_1_max = 80;
+		var esc_2_min = 20;
+		var esc_2_max = 80;
+		var esc_3_min = 20;
+		var esc_3_max = 80;
+
 		var socket = io();
-		var received_Data
+		var received_Data;
 		var Eulerangle;
 		socket.on("serial_connect",function(data){
 		switch(data){
@@ -122,15 +133,24 @@
 			<p>Motor 1</p>
 			<div class="esc_pwm slider-range-min" id="esc1_range"></div>
 			<input type="text" id="esc1_amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
-			
+			<input type="text" style="width:50px" value="1"id="e1_id">
+			<input type="text" style="width:50px" value="20" id="e1_min">
+			<input type="text" style="width:50px" value="80" id="e1_max"> 
+			<button id="e1_set">setting</button>
 			<p>Motor 2</p>
 			<div class="esc_pwm slider-range-min" id="esc2_range"></div>
 			<input type="text" id="esc2_amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
-
+			<input type="text" style="width:50px" value="2" id="e2_id">
+			<input type="text" style="width:50px" value="20" id="e2_min">
+			<input type="text" style="width:50px" value="80" id="e2_max"> 
+			<button id="e2_set">setting</button>
 			<p>Motor 3</p>
 			<div class="esc_pwm slider-range-min" id="esc3_range"></div>
 			<input type="text" id="esc3_amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
-
+			<input type="text" style="width:50px" value="3" id="e3_id">
+			<input type="text" style="width:50px" value="20" id="e3_min">
+			<input type="text" style="width:50px" value="80" id="e3_max"> 
+			<button id="e3_set">setting</button>
 			<p>Motor control together</p>
 			<div class="slider-range-min" id="move_together"></div>
 			<input type="text" id="esc_total_amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
@@ -199,6 +219,24 @@
 			$('#disconnect_serial').attr('disabled', 'disabled');
 			socket.emit("serial_connect","disconnect");
 		});
+
+		$("#e1_set").click(function(){
+			esc_id_1 = $("#e1_id").val();
+			esc_1_min = $("#e1_min").val();
+			esc_1_max = $("#e1_max").val();
+		});
+
+		$("#e2_set").click(function(){
+			esc_id_2 = $("#e2_id").val();
+			esc_2_min = $("#e2_min").val();
+			esc_2_max = $("#e2_max").val();
+		});
+
+		$("#e3_set").click(function(){
+			esc_id_3 = $("#e3_id").val();
+			esc_3_min = $("#e3_min").val();
+			esc_3_max = $("#e3_max").val();
+		});
 	</script>
 	
 	<script>
@@ -221,11 +259,11 @@
 				var sending_data = "";
 				var pwm_duty = ("0"+$(this).slider("value")).slice(-3);
 				if(this.id == "esc1_range")
-					sending_data = "SM1"+ pwm_duty + "E";
+					sending_data = "SM"+esc_id_1+ pwm_duty + "E";
 				else if(this.id == "esc2_range")
-					sending_data = "SM2"+ pwm_duty + "E";
+					sending_data = "SM"+esc_id_2+ pwm_duty + "E";
 				else if(this.id == "esc3_range")
-					sending_data = "SM3" + pwm_duty + "E"
+					sending_data = "SM"+esc_id_3+ pwm_duty + "E"
 				else if(this.id =="servo_range")
 					sending_data = "SC0" + pwm_duty + "E"
 				//$("#sending_data").val(sending_data);	
@@ -299,36 +337,36 @@
 					// sink
 						$('#esc1_range').slider("value",50);
 						$('#esc2_range').slider("value",50);
-						$('#esc3_range').slider("value",80);			
+						$('#esc3_range').slider("value",esc_3_max);
 						break;
 					case 17 :
 					// emerge
 						$('#esc1_range').slider("value",50);
 						$('#esc2_range').slider("value",50);
-						$('#esc3_range').slider("value",20);
+						$('#esc3_range').slider("value",esc_3_min);
 						break;
 					case 104 :
 					// up
-						$('#esc1_range').slider("value",80);
-						$('#esc2_range').slider("value",80);
+						$('#esc1_range').slider("value",esc_1_max);
+						$('#esc2_range').slider("value",esc_2_max);
 						$('#esc3_range').slider("value",50);
 						break;
 					case 98 :
 					// back
-						$('#esc1_range').slider("value",20);
-						$('#esc2_range').slider("value",20);
+						$('#esc1_range').slider("value",esc_1_min);
+						$('#esc2_range').slider("value",esc_2_min);
 						$('#esc3_range').slider("value",50);
 						break;
 					case 100 :
 					// left
-						$('#esc1_range').slider("value",20);
-						$('#esc2_range').slider("value",80);
+						$('#esc1_range').slider("value",esc_1_min);
+						$('#esc2_range').slider("value",esc_2_max);
 						$('#esc3_range').slider("value",50);
 						break;
 					case 102 :
 					// right
-						$('#esc1_range').slider("value",80);
-						$('#esc2_range').slider("value",20);
+						$('#esc1_range').slider("value",esc_1_max);
+						$('#esc2_range').slider("value",esc_2_min);
 						$('#esc3_range').slider("value",50);
 						break;
 				}
